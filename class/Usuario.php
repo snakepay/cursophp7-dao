@@ -48,11 +48,7 @@ class Usuario {
         ));
         
         if( isset( $result[0] ) ) {
-            $row = $result[0];            
-            $this->setIdusuarios ( $row['idusuario'] );
-            $this->setDeslogin   ( $row['deslogin'] );
-            $this->setDessenha   ( $row['dessenha'] );
-            $this->setDtcadastro ( new DateTime( $row['dtcadastro'] ) );
+            $this->setData($result[0]);
         }
         
     }
@@ -83,19 +79,58 @@ class Usuario {
             ":SENHA" => $senha
         ));
         
-        if( isset( $result[0] ) ) {
-            $row = $result[0];            
-            $this->setIdusuarios ( $row['idusuario'] );
-            $this->setDeslogin   ( $row['deslogin'] );
-            $this->setDessenha   ( $row['dessenha'] );
-            $this->setDtcadastro ( new DateTime( $row['dtcadastro'] ) );
+        if( isset( $result[0] ) ) {            
+            $this->setData($result[0]);
         } else {
             throw new Exception("Login ou senha inválidos");
         }
         
-    }    
+    }   
+    
+    public function setData( $data ) {
+        
+        $this->setIdusuarios ( $data['idusuario'] );
+        $this->setDeslogin   ( $data['deslogin'] );
+        $this->setDessenha   ( $data['dessenha'] );
+        $this->setDtcadastro ( new DateTime( $data['dtcadastro'] ) );
+        
+    }
 
-    public function __toString() {
+
+    public function insert() {
+        
+        $sql = new Sql();
+        
+        $results = $sql->select("CALL sp_usuarios_insert( :LOGIN, :SENHA )", array(
+            ":LOGIN" => $this->getDeslogin(),
+            ":SENHA" => $this->getDessenha()
+        ));
+        
+        if( isset( $results[0] ) ) {           
+            $this->setData( $results[0] );
+        }
+    }
+    
+    public function update( $login, $senha) {
+        
+        $this->setDeslogin($login);
+        $this->setDessenha($senha);
+        
+        $sql = new Sql();
+        $sql->query("UPDATE tb_usuarios SET deslogin = :LOGIN, dessenha = :SENHA WHERE idusuario = :ID", array(
+            ":LOGIN" => $this->getDeslogin(),
+            ":SENHA" => $this->getDessenha(),
+            ":ID"    => $this->getIdusuarios()
+        ));
+        
+    }
+
+    public function __construct( $login = "", $senha = "" ) {        
+        $this->setDeslogin($login);
+        $this->setDessenha($senha);        
+    }
+
+        public function __toString() {
         
         return json_encode([
             "idusuario"  => $this->getIdusuarios(),
