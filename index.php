@@ -38,10 +38,16 @@ $aluno->insert();
 echo $aluno;
 */
 
-/* Alterando um novo usuario */
+/* Alterando um novo usuario 
 $usuario = new Usuario();
 $usuario->loadById(8);
 $usuario->update("professor", "senhaprof");
+echo $usuario;
+*/
+
+$usuario = new Usuario();
+$usuario->loadById(7);
+$usuario->delete();
 echo $usuario;
 
 ?>
